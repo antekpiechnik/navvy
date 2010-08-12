@@ -5,6 +5,8 @@ module Navvy
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    identity :type => String
+
     field :object,        :type => String
     field :method_name,   :type => String
     field :arguments,     :type => String
