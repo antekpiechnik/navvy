@@ -44,7 +44,7 @@ module Navvy
     def self.next(limit = self.limit)
       where(:failed_at => nil).
         where(:completed_at => nil).
-        where(["run_at <= ?", Time.now]).
+        where(["#{connection.quote_column_name('run_at')} <= ?", Time.now]).
         order("priority DESC, created_at").
         limit(limit)
     end
@@ -58,9 +58,9 @@ module Navvy
 
     def self.cleanup
       if keep.is_a? Fixnum
-        where(["completed_at <= ?", keep.ago]).delete_all
+        where(["#{connection.quote_column_name('completed_at')} <= ?", keep.ago]).delete_all
       else
-        where("completed_at IS NOT NULL").delete_all unless keep?
+        where("#{connection.quote_column_name('completed_at')} IS NOT NULL").delete_all unless keep?
       end
     end
 
@@ -116,8 +116,8 @@ module Navvy
 
     def times_failed
       i = parent_id || id
-      self.class.where("failed_at IS NOT NULL").
-        where(["id = ? OR parent_id = ?", i, i]).
+      self.class.where("#{connection.quote_column_name('failed_at')} IS NOT NULL").
+        where(["#{connection.quote_column_name('id')} = ? OR #{connection.quote_column_name('parent_id')} = ?", i, i]).
         count
     end
   end
